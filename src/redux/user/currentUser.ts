@@ -1,25 +1,29 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { logInUser } from "@/interfaces/user";
+import type { logInUserInterface } from "@/interfaces/user";
 
-const initialState: logInUser | {} = {};
+const initialState: logInUserInterface = {
+    email: "",
+    username: "",
+    password: ""
+};
 
 const logInUserSlice = createSlice({
     name: "currentUser",
     initialState,
     reducers: {
-        checkCredentials: (state, action: PayloadAction<logInUser>) => {
-            if (action.payload.email || action.payload.username) {
-                state = action.payload;
-            }
+        addCredentials: (state, action: PayloadAction<logInUserInterface>) => {
+            state.email = action.payload.email;
+            state.username = action.payload.username;
+            state.password = action.payload.password;
         },
         logout: (state) => {
-            if (state) {
-                state = {};
-            }
+            // console.log(state);
+            state = initialState;
+            // console.log(state);
         }
     }
 });
 
 export default logInUserSlice.reducer;
-export const { checkCredentials } = logInUserSlice.actions;
+export const { addCredentials, logout } = logInUserSlice.actions;

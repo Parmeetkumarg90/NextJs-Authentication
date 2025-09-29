@@ -1,22 +1,61 @@
+"use client"
 import React from 'react'
 import Card from '@mui/material/Card';
-import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { signUpUser } from '@/interfaces/user';
+import { signUpUserInterface, usersInterface } from '@/interfaces/user';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { redirect } from 'next/navigation';
 import TextField from '@mui/material/TextField';
 import style from './style.module.css';
+import { logInUserSchema, signUpUserSchema } from '@/schema/authentication';
+import { enqueueSnackbar } from 'notistack';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { RootState } from '@/redux/store';
+import { addCredentials } from '@/redux/user/currentUser';
+import { addNewUser } from '@/redux/user/users';
+import { logInUserInterface } from '@/interfaces/user';
 
 const SignUpForm = () => {
-    const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<signUpUser>();
+    const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<signUpUserInterface>();
+    const users = useSelector((state: RootState) => state.users);
+    const loggedInUser = useSelector((state: RootState) => state.currentUser);
+    const dispatch = useDispatch();
 
-    const onSubmit: SubmitHandler<signUpUser> = (data) => {
-        console.log("signup form data: ", data);
-        reset();
+    useEffect(() => {
+        const isValidLogIn = isUserValid(loggedInUser);
+        if (isValidLogIn.success) {
+            redirect('/dashboard');
+        }
+    }, []);
+
+    const isUserValid = (user: logInUserInterface) => {
+        const isValid = signUpUserSchema.safeParse(user);
+        if (isValid) {
+            const userDetail = users.find((eachUser) => (eachUser.email === user.email || eachUser.username === user.username) && eachUser.password === user.password);
+            if (signUpUserSchema.safeParse(userDetail).success) {
+                dispatch(addCredentials(userDetail!));
+                return { success: true, email: userDetail?.email === user.email, username: userDetail?.username === user.username };
+            }
+        }
+        return { success: false, email: null, username: null };
+    }
+
+    const onSubmit: SubmitHandler<signUpUserInterface> = (data) => {
+        const isValidCredentials = isUserValid(data);
+        if (isValidCredentials.success) {
+            const reason = isValidCredentials.email ? "Account with same email already exists" : "This username is already taken. Please choose another one";
+            enqueueSnackbar(reason);
+        }
+        else {
+            dispatch(addCredentials(data));
+            dispatch(addNewUser(data));
+            enqueueSnackbar("Signup Success");
+            redirect('/dashboard');
+        }
     }
 
     return (
@@ -28,7 +67,7 @@ const SignUpForm = () => {
                     </Typography>
                     <Card className={`${style.card} ${style.input_card}`}>
                         <TextField
-                            required
+                            // required
                             id="filled-basic-username"
                             {...register("username")}
                             label="Username"
@@ -36,7 +75,7 @@ const SignUpForm = () => {
                             className={`${style.w_full}${style.pY}${style.mY}`}
                         />
                         <TextField
-                            required
+                            // required
                             id="filled-basic-email"
                             {...register("email")}
                             label="Email"
@@ -45,7 +84,7 @@ const SignUpForm = () => {
                             className={`${style.w_full}${style.pY}${style.mY}`}
                         />
                         <TextField
-                            required
+                            // required
                             id="filled-basic-password"
                             {...register("password", { required: true })}
                             label="Password"
@@ -54,7 +93,7 @@ const SignUpForm = () => {
                             className={`${style.w_full}${style.pY}${style.mY}`}
                         />
                         <TextField
-                            required
+                            // required
                             id="filled-basic-confirmPassword"
                             {...register("confirmPassword", { required: true })}
                             label="Confirm Password"

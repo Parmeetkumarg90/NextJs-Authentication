@@ -1,20 +1,20 @@
-interface users {
+interface usersInterface {
     email: string,
     username: string,
     password: string,
 }
 
-interface logInUser {
+interface logInUserInterface {
     email?: string,
     username?: string,
     password: string,
 }
 
-interface signUpUser {
+interface signUpUserInterface {
     email: string,
     username: string,
-    password: string
+    password: string,
     confirmPassword: string,
 }
 
-export type { users, logInUser, signUpUser };
+export type { usersInterface, logInUserInterface, signUpUserInterface };

@@ -1,24 +1,57 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Card from '@mui/material/Card';
-import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { logInUser } from '@/interfaces/user';
+import { logInUserInterface } from '@/interfaces/user';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { redirect } from 'next/navigation';
 import TextField from '@mui/material/TextField';
 import style from './style.module.css';
+import { logInUserSchema } from '@/schema/authentication';
+import { enqueueSnackbar } from 'notistack';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { addCredentials } from '@/redux/user/currentUser';
 
 const LoginForm = () => {
+    const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<logInUserInterface>();
+    const loggedInUser = useSelector((state: RootState) => state.currentUser);
+    const users = useSelector((state: RootState) => state.users);
     const [isLoginUsingUsername, setLoginUsingUsername] = useState<boolean>(false);
-    const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<logInUser>();
+    const dispatch = useDispatch();
 
-    const onSubmit: SubmitHandler<logInUser> = (data) => {
-        console.log("login form data: ", data);
-        reset();
+    useEffect(() => {
+        const isValidLogIn = isUserValid(loggedInUser);
+        if (isValidLogIn.success) {
+            redirect('/dashboard');
+        }
+    }, []);
+
+    const isUserValid = (user: logInUserInterface) => {
+        const isValid = logInUserSchema.safeParse(user);
+        if (isValid) {
+            const userDetail = users.find((eachUser) => (eachUser.email === user.email || eachUser.username === user.username) && eachUser.password === user.password);
+            if (logInUserSchema.safeParse(userDetail).success) {
+                dispatch(addCredentials(userDetail!));
+                return { success: true, email: userDetail?.email === user.email, username: userDetail?.username === user.username };
+            }
+        }
+        return { success: false, email: null, username: null };
+    }
+
+    const onSubmit: SubmitHandler<logInUserInterface> = (data) => {
+        const isValidCredentials = isUserValid(data);
+        if (isValidCredentials.success) {
+            dispatch(addCredentials(data));
+            enqueueSnackbar("Login Success");
+            redirect('/dashboard');
+        }
+        else {
+            enqueueSnackbar("Credentials you have entered are incorrect");
+        }
     }
 
     return (
@@ -31,7 +64,7 @@ const LoginForm = () => {
                     <Card className={`${style.card} ${style.input_card}`}>
                         {
                             isLoginUsingUsername ? <TextField
-                                required
+                                // required
                                 id="filled-basic-username"
                                 {...register("username")}
                                 label="Username"
@@ -40,7 +73,7 @@ const LoginForm = () => {
                             />
                                 :
                                 <TextField
-                                    required
+                                    // required
                                     id="filled-basic-email"
                                     {...register("email")}
                                     label="Email"
@@ -50,7 +83,7 @@ const LoginForm = () => {
                                 />
                         }
                         <TextField
-                            required
+                            // required
                             id="filled-basic-password"
                             {...register("password", { required: true })}
                             label="Password"
