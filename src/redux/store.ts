@@ -1,9 +1,17 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import usersReducer from "./user/users";
 import currentUserReducer from './user/currentUser';
-import persistReducer from "redux-persist/es/persistReducer";
 import storage from "redux-persist/es/storage";
-import { persistStore } from 'redux-persist';
+import {
+    persistStore,
+    persistReducer,
+    FLUSH,
+    REHYDRATE,
+    PAUSE,
+    PERSIST,
+    PURGE,
+    REGISTER,
+} from 'redux-persist'
 
 export const rootReducer = combineReducers({
     users: usersReducer,
@@ -21,10 +29,9 @@ const store = configureStore({
     reducer: persistedReducer,
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         serializableCheck: {
-            // Ignore redux-persist actions
-            ignoredActions: ["persist/PERSIST"],
+            ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         },
-    })
+    }),
 });
 
 const persister = persistStore(store);

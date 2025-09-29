@@ -15,9 +15,13 @@ import { enqueueSnackbar } from 'notistack';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { addCredentials } from '@/redux/user/currentUser';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const LoginForm = () => {
-    const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<logInUserInterface>();
+    console.log('hello i m sigini')
+    const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<logInUserInterface>({
+        resolver: zodResolver(logInUserSchema),
+    });
     const loggedInUser = useSelector((state: RootState) => state.currentUser);
     const users = useSelector((state: RootState) => state.users);
     const [isLoginUsingUsername, setLoginUsingUsername] = useState<boolean>(false);
@@ -32,11 +36,13 @@ const LoginForm = () => {
 
     const isUserValid = (user: logInUserInterface) => {
         const isValid = logInUserSchema.safeParse(user);
-        if (isValid) {
+        if (isValid.success) {
             const userDetail = users.find((eachUser) => (eachUser.email === user.email || eachUser.username === user.username) && eachUser.password === user.password);
             if (logInUserSchema.safeParse(userDetail).success) {
                 dispatch(addCredentials(userDetail!));
-                return { success: true, email: userDetail?.email === user.email, username: userDetail?.username === user.username };
+                return {
+                    success: true, email: userDetail?.email === user.email, username: userDetail?.username === user.username
+                };
             }
         }
         return { success: false, email: null, username: null };

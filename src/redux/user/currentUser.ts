@@ -17,11 +17,7 @@ const logInUserSlice = createSlice({
             state.username = action.payload.username;
             state.password = action.payload.password;
         },
-        logout: (state) => {
-            // console.log(state);
-            state = initialState;
-            // console.log(state);
-        }
+        logout: (state) => state = initialState
     }
 });
 

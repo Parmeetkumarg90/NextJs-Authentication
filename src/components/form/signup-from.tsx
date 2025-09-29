@@ -6,7 +6,7 @@ import CardActions from '@mui/material/CardActions';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { signUpUserInterface, usersInterface } from '@/interfaces/user';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import { redirect } from 'next/navigation';
 import TextField from '@mui/material/TextField';
 import style from './style.module.css';
@@ -18,9 +18,13 @@ import { RootState } from '@/redux/store';
 import { addCredentials } from '@/redux/user/currentUser';
 import { addNewUser } from '@/redux/user/users';
 import { logInUserInterface } from '@/interfaces/user';
+import { zodResolver } from "@hookform/resolvers/zod"
 
 const SignUpForm = () => {
-    const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<signUpUserInterface>();
+    const { register, handleSubmit, control, formState: { errors, }, reset } = useForm({
+        resolver: zodResolver(signUpUserSchema),
+    });
+
     const users = useSelector((state: RootState) => state.users);
     const loggedInUser = useSelector((state: RootState) => state.currentUser);
     const dispatch = useDispatch();
@@ -34,8 +38,8 @@ const SignUpForm = () => {
 
     const isUserValid = (user: logInUserInterface) => {
         const isValid = signUpUserSchema.safeParse(user);
-        if (isValid) {
-            const userDetail = users.find((eachUser) => (eachUser.email === user.email || eachUser.username === user.username) && eachUser.password === user.password);
+        if (isValid.success) {
+            const userDetail = users.find((eachUser) => eachUser.email === user.email && eachUser.username === user.username && eachUser.password === user.password);
             if (signUpUserSchema.safeParse(userDetail).success) {
                 dispatch(addCredentials(userDetail!));
                 return { success: true, email: userDetail?.email === user.email, username: userDetail?.username === user.username };
@@ -59,7 +63,7 @@ const SignUpForm = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} >
             <Card className={style.card}>
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div" className={style.text_center}>
@@ -70,6 +74,7 @@ const SignUpForm = () => {
                             // required
                             id="filled-basic-username"
                             {...register("username")}
+
                             label="Username"
                             variant="filled"
                             className={`${style.w_full}${style.pY}${style.mY}`}
@@ -108,7 +113,7 @@ const SignUpForm = () => {
                     <Button size="small" className={`${style.border}`} onClick={() => { redirect('/') }}>Already have an account?</Button>
                 </CardActions>
             </Card>
-        </form>
+        </form >
     )
 }
 

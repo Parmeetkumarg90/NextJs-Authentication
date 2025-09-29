@@ -39,7 +39,11 @@ const Dashboard = () => {
     return (
         <Container maxWidth="sm" className={`${style.container}`}>
             <Typography className={`${style.pY}`}>Welcome {loggedInUser.username}, and enjoy our services, stay on our app</Typography>
-            <Button className={`${style.pY}`} onClick={() => { dispatch(logout()); redirect('/'); }}>Logout</Button>
+            <Button className={`${style.pY}`}
+                onClick={() => {
+                    dispatch(logout());
+                    redirect('/');
+                }}>Logout</Button>
         </Container>
     )
 }
