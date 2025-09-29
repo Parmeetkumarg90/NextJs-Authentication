@@ -100,7 +100,7 @@ const LoginForm = () => {
                     </Card>
                 </CardContent>
                 <CardActions>
-                    <Button size="small" onClick={() => { setLoginUsingUsername(!isLoginUsingUsername); }}>Login Using Username</Button>
+                    <Button size="small" onClick={() => { setLoginUsingUsername(!isLoginUsingUsername); }}>Login Using {isLoginUsingUsername ? "Email" : "Username"}</Button>
                     <Button size="small" type='submit'>Login</Button>
                     <Button size="small" onClick={() => { redirect('/register') }}>Create Account</Button>
                 </CardActions>
