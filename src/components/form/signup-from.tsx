@@ -60,13 +60,16 @@ const SignUpForm = () => {
                 const reason = isValidCredentials.username ? "This username is already taken. Please choose another one" : "Account with same email already exists";
                 enqueueSnackbar(reason);
             }
+            else {
+                reset();
+                dispatch(addCredentials(data));
+                dispatch(addNewUser(data));
+                enqueueSnackbar("Signup Success");
+                redirect('/dashboard');
+            }
         }
         else {
-            reset();
-            dispatch(addCredentials(data));
-            dispatch(addNewUser(data));
-            enqueueSnackbar("Signup Success");
-            redirect('/dashboard');
+            enqueueSnackbar("Password not matching");
         }
     }
 
