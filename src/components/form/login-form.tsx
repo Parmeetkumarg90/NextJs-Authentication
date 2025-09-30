@@ -49,8 +49,12 @@ const LoginForm = () => {
     }
 
     const onSubmit: SubmitHandler<logInUserInterface> = (data) => {
+        data.email = data?.email?.trim();
+        data.password = data?.password?.trim();
+        data.username = data?.username?.trim();
         const isValidCredentials = isUserValid(data);
         if (isValidCredentials.success) {
+            reset();
             dispatch(addCredentials(data));
             enqueueSnackbar("Login Success");
             redirect('/dashboard');
@@ -100,7 +104,7 @@ const LoginForm = () => {
                     </Card>
                 </CardContent>
                 <CardActions>
-                    <Button size="small" onClick={() => { setLoginUsingUsername(!isLoginUsingUsername); }}>Login Using {isLoginUsingUsername ? "Email" : "Username"}</Button>
+                    <Button size="small" onClick={() => { setLoginUsingUsername(!isLoginUsingUsername); reset(); }}>Login Using {isLoginUsingUsername ? "Email" : "Username"}</Button>
                     <Button size="small" type='submit'>Login</Button>
                     <Button size="small" onClick={() => { redirect('/register') }}>Create Account</Button>
                 </CardActions>

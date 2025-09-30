@@ -49,12 +49,17 @@ const SignUpForm = () => {
     }
 
     const onSubmit: SubmitHandler<signUpUserInterface> = (data) => {
+        data.email = data?.email?.trim();
+        data.password = data?.password?.trim();
+        data.confirmPassword = data?.confirmPassword?.trim();
+        data.username = data?.username?.trim();
         const isValidCredentials = isUserValid(data);
         if (isValidCredentials.success) {
             const reason = isValidCredentials.email ? "Account with same email already exists" : "This username is already taken. Please choose another one";
             enqueueSnackbar(reason);
         }
         else {
+            reset();
             dispatch(addCredentials(data));
             dispatch(addNewUser(data));
             enqueueSnackbar("Signup Success");
@@ -74,7 +79,6 @@ const SignUpForm = () => {
                             // required
                             id="filled-basic-username"
                             {...register("username")}
-
                             label="Username"
                             variant="filled"
                             className={`${style.w_full}${style.pY}${style.mY}`}
