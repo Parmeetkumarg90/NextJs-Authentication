@@ -21,7 +21,7 @@ import { logInUserInterface } from '@/interfaces/user';
 import { zodResolver } from "@hookform/resolvers/zod"
 
 const SignUpForm = () => {
-    const { register, handleSubmit, control, formState: { errors, }, reset } = useForm({
+    const { register, handleSubmit, reset } = useForm({
         resolver: zodResolver(signUpUserSchema),
     });
 

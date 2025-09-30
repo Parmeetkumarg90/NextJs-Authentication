@@ -19,7 +19,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 const LoginForm = () => {
     console.log('hello i m sigini')
-    const { register, handleSubmit, watch, formState: { errors }, reset } = useForm<logInUserInterface>({
+    const { register, handleSubmit, reset } = useForm<logInUserInterface>({
         resolver: zodResolver(logInUserSchema),
     });
     const loggedInUser = useSelector((state: RootState) => state.currentUser);
