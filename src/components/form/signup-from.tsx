@@ -99,7 +99,7 @@ const SignUpForm = () => {
                             // required
                             id="filled-basic-password"
                             {...register("password", { required: true })}
-                            label="Passwordregitry"
+                            label="Password"
                             variant="filled"
                             type='password'
                             className={`${style.w_full}${style.pY}${style.mY}`}
