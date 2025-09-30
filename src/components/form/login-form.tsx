@@ -18,7 +18,6 @@ import { addCredentials } from '@/redux/user/currentUser';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 const LoginForm = () => {
-    console.log('hello i m sigini')
     const { register, handleSubmit, reset } = useForm<logInUserInterface>({
         resolver: zodResolver(logInUserSchema),
     });

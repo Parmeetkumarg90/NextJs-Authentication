@@ -5,8 +5,8 @@ import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { signUpUserInterface, usersInterface } from '@/interfaces/user';
-import { useForm, SubmitHandler, Controller } from 'react-hook-form';
+import { signUpUserInterface } from '@/interfaces/user';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { redirect } from 'next/navigation';
 import TextField from '@mui/material/TextField';
 import style from './style.module.css';
@@ -37,7 +37,8 @@ const SignUpForm = () => {
     }, []);
 
     const isUserValid = (user: logInUserInterface) => {
-        const isValid = signUpUserSchema.safeParse(user);
+        const isValid = logInUserSchema.safeParse(user);
+        // console.log("🚀 ~ isUserValid ~ isValid:", isValid);
         if (isValid.success) {
             const userDetail = users.find((eachUser) => eachUser.email === user.email && eachUser.username === user.username && eachUser.password === user.password);
             if (signUpUserSchema.safeParse(userDetail).success) {
@@ -53,10 +54,12 @@ const SignUpForm = () => {
         data.password = data?.password?.trim();
         data.confirmPassword = data?.confirmPassword?.trim();
         data.username = data?.username?.trim();
-        const isValidCredentials = isUserValid(data);
-        if (isValidCredentials.success) {
-            const reason = isValidCredentials.username ? "This username is already taken. Please choose another one" : "Account with same email already exists";
-            enqueueSnackbar(reason);
+        if (data.password === data.confirmPassword) {
+            const isValidCredentials = isUserValid(data);
+            if (isValidCredentials.success) {
+                const reason = isValidCredentials.username ? "This username is already taken. Please choose another one" : "Account with same email already exists";
+                enqueueSnackbar(reason);
+            }
         }
         else {
             reset();
@@ -96,7 +99,7 @@ const SignUpForm = () => {
                             // required
                             id="filled-basic-password"
                             {...register("password", { required: true })}
-                            label="Password"
+                            label="Passwordregitry"
                             variant="filled"
                             type='password'
                             className={`${style.w_full}${style.pY}${style.mY}`}
