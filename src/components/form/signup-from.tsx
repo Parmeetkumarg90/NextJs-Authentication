@@ -55,7 +55,7 @@ const SignUpForm = () => {
         data.username = data?.username?.trim();
         const isValidCredentials = isUserValid(data);
         if (isValidCredentials.success) {
-            const reason = isValidCredentials.email ? "Account with same email already exists" : "This username is already taken. Please choose another one";
+            const reason = isValidCredentials.username ? "This username is already taken. Please choose another one" : "Account with same email already exists";
             enqueueSnackbar(reason);
         }
         else {
